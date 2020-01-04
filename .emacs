@@ -12,7 +12,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cua-mode t nil (cua-base))
- '(package-selected-packages (quote (tabbar auto-complete helm popup async)))
+ '(package-selected-packages (quote (imenu-list tabbar auto-complete helm popup async)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -42,6 +42,7 @@
 (global-set-key (kbd "<f11>") 'delete-other-windows)
 (global-set-key (kbd "S-<f11>") 'toggle-frame-fullscreen)
 (global-set-key (kbd "C-/") 'comment-line)
+(global-set-key (kbd "C-w") 'kill-this-buffer)
 (put 'upcase-region 'disabled nil)
 
 ;; customize-keys-for-helm
@@ -99,7 +100,26 @@
 	  (set-buffer-modified-p nil))))))
 (global-set-key (kbd "C-x C-r") 'rename-file-and-buffer)
 
+;; term mode customization ==============================
 (require 'term)
 (define-key term-raw-map (kbd "M-m") 'term-line-mode)
 (define-key term-mode-map (kbd "M-m") 'term-char-mode)
 
+;; imenu customization for search ==============================
+(with-eval-after-load 'imenu
+  (setq imenu-list-focus-after-activation t
+	imenu-list-auto-resize t)
+  (global-set-key (kbd "C-'")
+		  (lambda ()
+		    (interactive)
+		    (imenu-list-smart-toggle)
+		    (when (get-buffer-window imenu-list-buffer-name t)
+		      (goto-char (point-min))
+		      (isearch-forward))))
+  (define-key imenu-list-major-mode-map
+    (kbd "<return>")
+    (lambda ()
+      (interactive)
+      (push-button)
+      (imenu-list-quit-window))))
+    
