@@ -1,0 +1,1 @@
+A curated emacs set up to decrease the learning curve.
