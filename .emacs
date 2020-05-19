@@ -65,8 +65,8 @@
   (setq ac-auto-start 1
 	ac-auto-show-menu 0.1
 	ac-use-menu-map t)
-  (define-key ac-mode-map (kbd "C-n") 'ac-next)
-  (define-key ac-mode-map (kbd "C-p") 'ac-previous))
+  (define-key ac-menu-map (kbd "C-n") 'ac-next)
+  (define-key ac-menu-map (kbd "C-p") 'ac-previous))
 (global-auto-complete-mode 1)
 
 
