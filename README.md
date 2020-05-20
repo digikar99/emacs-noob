@@ -18,7 +18,7 @@ a few minutes. Restart emacs.
 
 - Melpa added
 - Packages: use-package, tabbar-mode, ace-window, auto-complete, helm
-- Several `C-x` bindings are bound to nil
+- `C-x` bindings not listed below are bound to nil: In case some exists that is missing below, it is a bug; report them! Known issue is `C-x 8-` key bindings which I've been unable to disable.
 - global auto-complete-mode, electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
 - Slower scroll
 
@@ -28,12 +28,13 @@ a few minutes. Restart emacs.
 **Text Editing**
 
 - C-a: Select all
-- C-f: Search (forward)
 - C-r: Replace (forward); because see C-h next
 - C-h (Backspace): Delete word to the left - this is so because on the terminal backspace
-and C-h are equivalent. (And I haven't bothered for a workaround.)
+and C-h are equivalent. And I haven't searched enough for a workaround.
 - C-z: Undo - in emacs, redo is undo of undo; this also avoids loss of redo-undo "trees"
-- C-s: Save file (save-buffer)
+- `C-<space>` [std]: enter/exit text-selection mode
+- C-s [std]: Search (forward); because changing this means changing several other maps
+and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
 - C-w [std]: Cut; because C-x is complicated
 - C-y [std]: Paste; because
 - C-v [std]: Scroll down
@@ -42,20 +43,19 @@ and C-h are equivalent. (And I haven't bothered for a workaround.)
 - C-k [std]: Cut line this point forward
 - M-k: Delete line this point forward
 - C-/: Un/comment-line; also works for un/commenting region when selected
-- `C-<space>` [std]: to enter/exit text-selection mode
 
 
 
 - M-S-<up>/<down>: Move line (selected region) up or down
-- C-M-f: Forward search symbol at point
+- C-M-s: Forward search symbol at point
 - C-M-r: Forward replace symbol at point
 - M-q: Quit emacs (with prompt)
 
 
 **Window and Buffer Management**
 
-- F7: Split window horizontally ("<f10>" is more mnemonic, but its bound to something
-in some terminals)
+- F7: Split window horizontally: "<f10>" is more memorable, but its bound to something
+in some terminals
 - F8: Split window vertically - two parts of the "8"
 - F9: Expand window vertically
 - F11 [std]: Toggle "frame" full screen
@@ -69,6 +69,7 @@ trying to go full screen)
 - `C-<tab>` / `C-S-<tab>`: Switch tabs
 - M-x [std]: arbitrary commands (helm-M-x)
 - C-x C-f [std]: Open file (helm-find-files)
+- C-x C-s [std]: Save file
 - C-x C-d [~std]: Open directory. Press '?' for help. (dired)
 - C-x C-w: Close file (kill-this-buffer)
 - C-x C-r: Rename file (and buffer)
