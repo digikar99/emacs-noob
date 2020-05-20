@@ -28,13 +28,13 @@ a few minutes. Restart emacs.
 **Text Editing**
 
 - C-a: Select all
+- C-s [std]: Search (forward); because changing this means changing several other maps
+and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
 - C-r: Replace (forward); because see C-h next
 - C-h (Backspace): Delete word to the left - this is so because on the terminal backspace
 and C-h are equivalent. And I haven't searched enough for a workaround.
 - C-z: Undo - in emacs, redo is undo of undo; this also avoids loss of redo-undo "trees"
 - `C-<space>` [std]: enter/exit text-selection mode
-- C-s [std]: Search (forward); because changing this means changing several other maps
-and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
 - C-w [std]: Cut; because C-x is complicated
 - C-y [std]: Paste; because
 - C-v [std]: Scroll down
@@ -43,6 +43,7 @@ and we don't want to go "too far" from vanilla emacs, so that you get used to it
 - C-k [std]: Cut line this point forward
 - M-k: Delete line this point forward
 - C-/: Un/comment-line; also works for un/commenting region when selected
+- C-l: Goto line
 
 
 

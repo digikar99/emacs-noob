@@ -177,6 +177,7 @@
          ("C-j" . newline)
 	 ("C-w" . kill-region-when-active)
 	 ("C-y" . yank)
+	 ("C-l" . goto-line)
          ("C-/" . comment-line)
 	 ("M-k" . ruthlessly-kill-line)
          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
