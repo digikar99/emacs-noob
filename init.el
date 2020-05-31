@@ -70,7 +70,7 @@
          ("M-m" . term-line-mode)
          ("M-n" . term-send-down)
          ("M-p" . term-send-up)
-         :map term-line-map 
+         :map term-mode-map 
          ("M-m" . term-raw-mode)
          ("M-n" . term-send-down)
          ("M-p" . term-send-up)))
