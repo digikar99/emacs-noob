@@ -5,7 +5,7 @@ see the [version tagged demo](https://github.com/digikar99/emacs-noob/tree/demo)
 
 ## Requirements
 
-Emacs 25 and up! (Due to helm.)
+Emacs 26 and up! (Emacs 25 and up due to helm; emacs 26 and up due to an auto-complete dependency.)
 
 ## Installation
 
@@ -14,20 +14,24 @@ Drop the `init.el` in your `~/.emacs.d/` and (re)start emacs.
 Emacs will download `use-package` and then the required packages. This should take
 a few minutes. Restart emacs.
 
+## On Startup
+
+- Get [an implementation](https://common-lisp.net/implementations): may be `sudo apt install sbcl # if you are using some linux distro`.
+- Change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary.
+- [Install quicklisp](https://www.quicklisp.org/beta/).
+
 ## Features
 
 - Melpa added
-- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm
+- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, slime, company, slime-company
 - `C-x` bindings not listed below are bound to nil: In case some exists that is missing below, it is a bug; report them! Known issue is `C-x 8-` key bindings which I've been unable to disable.
-- global auto-complete-mode, electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
+- global electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
 - Slower scroll
 
+## key-bindings
 
-## Key-bindings
+**text editing**
 
-**Text Editing**
-
-- C-a: Select all
 - C-s [std]: Search (forward); because changing this means changing several other maps
 and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
 - C-r: Replace (forward); because see C-h next
@@ -35,6 +39,9 @@ and we don't want to go "too far" from vanilla emacs, so that you get used to it
 and C-h are equivalent. And I haven't searched enough for a workaround.
 - C-z: Undo - in emacs, redo is undo of undo; this also avoids loss of redo-undo "trees"
 - `C-<space>` [std]: enter/exit text-selection mode
+- C-x h [std]: Select all
+- C-a [std]: Move cursor to start of line
+- C-e [std]: Move cursor to end of line
 - C-w [std]: Cut; because C-x is complicated
 - C-y [std]: Paste; because
 - C-v [std]: Scroll down
@@ -51,6 +58,7 @@ and C-h are equivalent. And I haven't searched enough for a workaround.
 - C-M-s: Forward search symbol at point
 - C-M-r: Forward replace symbol at point
 - M-q: Quit emacs (with prompt)
+- M-l: Open slime-repl
 
 
 **Window and Buffer Management**
@@ -85,3 +93,4 @@ trying to go full screen)
 - M-m: ansi-term switch between line and char modes
 - M-n: ansi-term next command
 - M-p: ansi-term previous command
+
