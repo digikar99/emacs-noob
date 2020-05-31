@@ -7,6 +7,10 @@ see the [version tagged demo](https://github.com/digikar99/emacs-noob/tree/demo)
 
 Emacs 26 and up! (Emacs 25 and up due to helm; emacs 26 and up due to an auto-complete dependency.)
 
+<p align="center">
+<img src="./common-lisp-slime.jpg" height="800px"/>
+</p>
+
 ## Installation
 
 Drop the `init.el` in your `~/.emacs.d/` and (re)start emacs.
@@ -20,7 +24,7 @@ a few minutes. Restart emacs.
 
 - Get [an implementation](https://common-lisp.net/implementations): may be `sudo apt install sbcl # if you are using some linux distro`.
 
-- If you are on android, the following steps should help you get an ECL up and working:
+- If you are on android, the following steps should help you get an ECL up and working (credits to the [following doc](https://github.com/plops/ecl-termux-binary)):
 
 ```sh
 apt update && apt install build-essential texinfo
@@ -37,7 +41,7 @@ make install
 
 - Download quicklisp: `wget http://beta.quicklisp.org/quicklisp.lisp -O ~/quicklisp.lisp`.
 
-- Load quicklisp: `/path/to/your/implementation --load ~/quicklisp.lisp` and follow the instructions (for example, for the aendroid case above, this is `~/.local/bin/ecl --load ~/quicklisp.lisp`):
+- Load quicklisp `/path/to/your/implementation --load ~/quicklisp.lisp` and follow the instructions. For example, for the android case above, this is `~/.local/bin/ecl --load ~/quicklisp.lisp`. In some cases, you might want to refer to `/path/to/your/implementation --help`or equivalent.
 
 ```lisp
 (quicklisp-quickstart:install)
@@ -53,7 +57,7 @@ make install
 
 **Get Started**
 
-- If there were any errors, preferable restart emacs: `M-q yes` to quit. And then start again.
+- If there were any errors, preferably restart emacs: `M-q yes` to quit. And then start again.
 - You may also want to learn about [emacs daemon](https://www.emacswiki.org/emacs/EmacsAsDaemon) - basically that `emacs --daemon` and `emacsclient` (and `C-x C-w` in our customization).
 - Any of `M-x slime`, `M-l`, `open-slime` to start slime and start playing with Common Lisp.
 
@@ -68,6 +72,8 @@ make install
 ## key-bindings
 
 **text editing**
+
+Bonus: [Several emacs key-bindings carry over to bash-based terminals!](https://superuser.com/questions/352983/which-emacs-shortcuts-are-useful-in-bash) So, these are useful beyond emacs as well!
 
 - C-s [std]: Search (forward); because changing this means changing several other maps
 and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
@@ -91,7 +97,7 @@ and C-h are equivalent. And I haven't searched enough for a workaround.
 
 
 
-- M-S-<up>/<down>: Move line (selected region) up or down
+- `M-S-<up>/<down>`: Move line (selected region) up or down
 - C-M-s: Forward search symbol at point
 - C-M-r: Forward replace symbol at point
 - M-q: Quit emacs (with prompt)
@@ -100,12 +106,12 @@ and C-h are equivalent. And I haven't searched enough for a workaround.
 
 **Window and Buffer Management**
 
-- F7: Split window horizontally: "<f10>" is more memorable, but its bound to something
+- F7: Split window horizontally: `<f10>` is more memorable, but its bound to something
 in some terminals
 - F8: Split window vertically - two parts of the "8"
 - F9: Expand window vertically
 - F11 [std]: Toggle "frame" full screen
-- S-F11: Delete other windows (this, to avoid accidentally pressing "<f11>" while
+- S-F11: Delete other windows (this, to avoid accidentally pressing `<f11>` while
 trying to go full screen)
 - C-o [~std]: Switch window
 - M-o: Switch buffer
