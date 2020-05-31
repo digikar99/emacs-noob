@@ -5,7 +5,7 @@ see the [version tagged demo](https://github.com/digikar99/emacs-noob/tree/demo)
 
 ## Requirements
 
-Emacs 25 and up! (Due to helm.)
+Emacs 26 and up! (Due to helm, 25 and up; due to a auto-complete dependency, 26 and up!.)
 
 ## Installation
 
