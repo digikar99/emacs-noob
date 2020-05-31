@@ -16,9 +16,46 @@ a few minutes. Restart emacs.
 
 ## On Startup
 
+**Get an implementation**
+
 - Get [an implementation](https://common-lisp.net/implementations): may be `sudo apt install sbcl # if you are using some linux distro`.
-- Change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary.
-- [Install quicklisp](https://www.quicklisp.org/beta/).
+
+- If you are on android, the following steps should help you get an ECL up and working:
+
+```sh
+apt update && apt install build-essential texinfo
+cd ~
+git clone https://gitlab.com/embeddable-common-lisp/ecl.git
+cd ecl
+git checkout 20.4.24
+./configure --prefix $HOME/.local --build=aarch64-linux-android --enable-gmp=included
+make -j4 # or whatever your number of cores
+make install
+```
+
+**Install quicklisp**
+
+- Download quicklisp: `wget http://beta.quicklisp.org/quicklisp.lisp -O ~/quicklisp.lisp`.
+
+- Load quicklisp: `/path/to/your/implementation --load ~/quicklisp.lisp` and follow the instructions (for example, for the aendroid case above, this is `~/.local/bin/ecl --load ~/quicklisp.lisp`):
+
+```lisp
+(quicklisp-quickstart:install)
+(ql:add-to-init-file)
+(quit)
+```
+
+**Configure init.el**
+
+- Drop the `init.el` in `.emacs.d`: `mkdir .emacs.d && wget https://raw.githubusercontent.com/digikar99/emacs-noob/slime-company/init.el -O ~/.emacs.d/init.el`.
+- Besides the [key bindings](#key-bindings) below, [this tutorial on emacs lisp](https://learnxinyminutes.com/docs/elisp/) should help you gain familiarity with the emacs workflow.
+- Now, change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary (say `/data/data/com.termux/files/home/.local/bin/ecl`). (Got the hang of `C-x C-e`?)
+
+**Get Started**
+
+- If there were any errors, preferable restart emacs: `M-q yes` to quit. And then start again.
+- You may also want to learn about [emacs daemon](https://www.emacswiki.org/emacs/EmacsAsDaemon) - basically that `emacs --daemon` and `emacsclient` (and `C-x C-w` in our customization).
+- Any of `M-x slime`, `M-l`, `open-slime` to start slime and start playing with Common Lisp.
 
 ## Features
 
