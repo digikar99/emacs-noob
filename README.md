@@ -27,12 +27,12 @@ a few minutes. Restart emacs.
 - If you are on android, the following steps should help you get an ECL up and working (credits to the [following doc](https://github.com/plops/ecl-termux-binary)):
 
 ```sh
-apt update && apt install build-essential texinfo
+apt update && apt install build-essential texinfo git
 cd ~
 git clone https://gitlab.com/embeddable-common-lisp/ecl.git
 cd ecl
 git checkout 20.4.24
-./configure --prefix $HOME/.local --build=aarch64-linux-android --enable-gmp=included
+./configure --prefix $HOME/.local --build=$(uname -m)-linux-android --enable-gmp=included
 make -j4 # or whatever your number of cores
 make install
 ```
