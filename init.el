@@ -248,7 +248,7 @@
          ("C-/" . comment-line)
          ("C-." . goto-last-change)
          ("C-," . goto-last-change-reverse)
-	 ("M-k" . ruthlessly-kill-line)
+         ("M-k" . ruthlessly-kill-line)
          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
          ("C-S-t" . reopen-killed-file))
   :bind* (("M-o" . switch-to-buffer)
