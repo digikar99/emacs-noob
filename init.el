@@ -151,7 +151,7 @@
     (interactive)
     (when (region-active-p)
       (if (> (point) (mark))
-	  (exchange-point-and-mark))           
+          (exchange-point-and-mark))           
       (kill-region (point) (mark))))
 
   ;;; M-k
@@ -161,11 +161,11 @@
 
   ;;; Disable key bindings with C-x prefix
   (cl-loop for ch below 128
-  	   do (global-set-key (kbd (concat "C-x " (string ch))) nil))
+           do (global-set-key (kbd (concat "C-x " (string ch))) nil))
 
   ;;; FIXME: C-x 8 doesn't set to nil
   ;; (cl-loop for ch below 128
-  ;; 	   do (define-key iso-transl-ctl-x-8-map (kbd (concat "C-x 8 " (string ch))) nil))
+  ;;       do (define-key iso-transl-ctl-x-8-map (kbd (concat "C-x 8 " (string ch))) nil))
 
   ;; Source: https://www.reddit.com/r/emacs/comments/4ermj9/how_to_restore_last_window_size_in_emacs/
   ;; Custom functions/hooks for persisting/loading frame geometry upon save/load
@@ -201,39 +201,39 @@
         (load-file frameg-file))))  
   
   :bind (("C-a" . mark-whole-buffer)
-	 ("C-s" . isearch-forward)
-	 ("C-M-s" . isearch-forward-symbol-at-point)
-	 ("C-M-r" . isearch-query-replace-symbol-at-point)
-	 ("C-r" . query-replace)
-	 ("C-h" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!
-	 ("C-z" . undo)
+         ("C-s" . isearch-forward)
+         ("C-M-s" . isearch-forward-symbol-at-point)
+         ("C-M-r" . isearch-query-replace-symbol-at-point)
+         ("C-r" . query-replace)
+         ("C-h" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!
+         ("C-z" . undo)
          ("C-j" . newline)
-	 ("C-w" . kill-region-when-active)
-	 ("C-y" . yank)
-	 ("C-l" . goto-line)
+         ("C-w" . kill-region-when-active)
+         ("C-y" . yank)
+         ("C-l" . goto-line)
          ("C-/" . comment-line)
          ("C-." . goto-last-change)
          ("C-," . goto-last-change-reverse)
-	 ("M-k" . ruthlessly-kill-line)
+         ("M-k" . ruthlessly-kill-line)
          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
          ("C-S-t" . reopen-killed-file))
   :bind* (("M-o" . switch-to-buffer)
-	  ("C-v" . scroll-up)
-	  ("M-v" . scroll-down)
+          ("C-v" . scroll-up)
+          ("M-v" . scroll-down)
           ("C-o" . ace-window)
           ("<f8>" . split-window-vertically)
           ("<f9>" . delete-other-windows-vertically)
           ("<f7>" . split-window-horizontally)
           ("S-<f11>" . delete-other-windows)
           ("<f11>" . toggle-frame-fullscreen)
-	  ("C-x C-e" . eval-last-sexp)
+          ("C-x C-e" . eval-last-sexp)
           ("C-x C-r" . rename-file-and-buffer)
           ("C-x C-w" . kill-this-buffer)
-	  ("C-x C-d" . dired)
-	  ("C-x C-k" . delete-window)
-	  ("C-x C-s" . save-buffer)
-	  ("M-h" . help-command)
-	  ("M-q" . save-buffers-kill-emacs)
+          ("C-x C-d" . dired)
+          ("C-x C-k" . delete-window)
+          ("C-x C-s" . save-buffer)
+          ("M-h" . help-command)
+          ("M-q" . save-buffers-kill-emacs)
           ("M-S-<up>" . move-text-up)
           ("M-S-<down>" . move-text-down)))
 
