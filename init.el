@@ -80,7 +80,12 @@
           ("<backspace>" . delete-backward-char)
           ("C-<backspace>" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!          
           ("<delete>" . delete-forward-char)
-          ("C-<delete>" . kill-word)))
+          ("C-<delete>" . kill-word)
+          
+          ("<mouse-1>" . mouse-set-point)
+          ("<mouse-4>" . scroll-down)
+          ("<mouse-5>" . scroll-up)
+          ("<drag-mouse-1>" . mouse-set-region)))
   (use-global-map my-global-map))
 
 (use-package helm
@@ -250,9 +255,13 @@
   :bind (:map isearch-mode-map
               ("C-S-f" . isearch-repeat-backward)
               ("C-f" . isearch-repeat-forward)
-              :map minibuffer-local-map
+         :map minibuffer-local-map
               ("<return>" . exit-minibuffer)
-              :map override-global-map
+         :map package-menu-mode-map
+              ("<return>" . package-menu-describe-package)
+         :map help-mode-map
+              ("<return>" . push-button)
+         :map override-global-map
               ("C-f" . isearch-forward))
 
   :bind* (("C-M-f" . isearch-forward-symbol-at-point)
@@ -261,15 +270,12 @@
           ("M-q" . save-buffers-kill-emacs)
           ("M-S-<up>" . move-text-up)
           ("M-S-<down>" . move-text-down)
+          ("M-b" . switch-to-buffer)
           ("M-o" . ace-window)
           ("M-e" . eval-last-sexp)
           ("M-k" . delete-window)
           ("M-r" . rename-file-and-buffer)
           ("M-k" . ruthlessly-kill-line)
-          ("<mouse-1>" . mouse-set-point)
-          ("<mouse-4>" . scroll-down)
-          ("<mouse-5>" . scroll-up)
-	  ("<drag-mouse-1>" . mouse-set-region)
           ("<f8>" . split-window-vertically)
           ("<f9>" . delete-other-windows-vertically)
           ("<f7>" . split-window-horizontally)

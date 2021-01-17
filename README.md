@@ -40,8 +40,8 @@ The key-bindings are available at [init.el](./init.el).
 
 **Other partially non-standard key-bindings**
 
-- C-p: Switch buffer
 - C-l: Goto line
+- M-b: Switch buffer
 - M-q: Quit emacs (with prompt)
 - M-o: Other window
 - M-k: Delete line this point forward
