@@ -12,7 +12,7 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(make-backup-files nil)
- '(package-selected-packages (quote (ace-window auto-complete tabbar helm use-package)))
+ '(package-selected-packages (quote (goto-chg ace-window auto-complete tabbar helm use-package)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -166,6 +166,39 @@
   ;;; FIXME: C-x 8 doesn't set to nil
   ;; (cl-loop for ch below 128
   ;; 	   do (define-key iso-transl-ctl-x-8-map (kbd (concat "C-x 8 " (string ch))) nil))
+
+  ;; Source: https://www.reddit.com/r/emacs/comments/4ermj9/how_to_restore_last_window_size_in_emacs/
+  ;; Custom functions/hooks for persisting/loading frame geometry upon save/load
+  (defun save-frameg ()
+    "Gets the current frame's geometry and saves to ~/.emacs.frameg."
+    (let ((frameg-font (frame-parameter (selected-frame) 'font))
+          (frameg-left (frame-parameter (selected-frame) 'left))
+          (frameg-top (frame-parameter (selected-frame) 'top))
+          (frameg-width (frame-parameter (selected-frame) 'width))
+          (frameg-height (frame-parameter (selected-frame) 'height))
+          (frameg-file (expand-file-name "~/.emacs.frameg")))
+      (with-temp-buffer
+        ;; Turn off backup for this file
+        (make-local-variable 'make-backup-files)
+        (setq make-backup-files nil)
+        (insert
+         ";;; This file stores the previous emacs frame's geometry.\n"
+         ";;; Last generated " (current-time-string) ".\n"
+         "(setq initial-frame-alist\n"
+         ;; " '((font . \"" frameg-font "\")\n"
+         " '("
+         (format " (top . %d)\n" (max frameg-top 0))
+         (format " (left . %d)\n" (max frameg-left 0))
+         (format " (width . %d)\n" (max frameg-width 0))
+         (format " (height . %d)))\n" (max frameg-height 0)))
+        (when (file-writable-p frameg-file)
+          (write-file frameg-file)))))
+
+  (defun load-frameg ()
+    "Loads ~/.emacs.frameg which should load the previous frame's geometry."
+    (let ((frameg-file (expand-file-name "~/.emacs.frameg")))
+      (when (file-readable-p frameg-file)
+        (load-file frameg-file))))  
   
   :bind (("C-a" . mark-whole-buffer)
 	 ("C-s" . isearch-forward)
@@ -179,6 +212,8 @@
 	 ("C-y" . yank)
 	 ("C-l" . goto-line)
          ("C-/" . comment-line)
+         ("C-." . goto-last-change)
+         ("C-," . goto-last-change-reverse)
 	 ("M-k" . ruthlessly-kill-line)
          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
          ("C-S-t" . reopen-killed-file))
@@ -209,6 +244,10 @@
         mouse-wheel-progressive-speed t
         mouse-wheel-follow-mouse t
         scroll-step 1)
+  ;;; Save/Load window-geometry
+  (when window-system
+    (add-hook 'after-init-hook 'load-frameg)
+    (add-hook 'kill-emacs-hook 'save-frameg))
   ;;; Enable additional modes
   (helm-mode)
   (tabbar-mode)
