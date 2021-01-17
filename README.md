@@ -12,48 +12,47 @@ Emacs 26 and up! (Due to helm, 25 and up; due to a auto-complete dependency, 26 
 Drop the `init.el` in your `~/.emacs.d/` and (re)start emacs.
 
 Emacs will download `use-package` and then the required packages. This should take
-a few minutes. Restart emacs.
+a few minutes. Optionally, restart emacs.
 
 ## Features
 
 - Melpa added
-- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm
+- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, goto-chg
 - `C-x` bindings not listed below are bound to nil: In case some exists that is missing below, it is a bug; report them! Known issue is `C-x 8-` key bindings which I've been unable to disable.
 - global auto-complete-mode, electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
-- Slower scroll
+- Slower / less-jerky scroll
 
+## Usage Intention
+
+This branch `emacs-modern` is intended for one-off emacs usage. Users are *strongly discouraged* from using this in the longer run or for learning emacs. In the longer run, users might want to consider using the [master branch](https://github.com/digikar99/emacs-noob) or one of the more established [emacs starter kits](https://github.com/emacs-tw/awesome-emacs#starter-kit).
+
+## Branch Specialized for Common Lisp Development
+
+- If you do not have access to a full blown emacs GUI and are stuck with a terminal-only version, you are better off with [slime-company-ecl](https://github.com/digikar99/emacs-noob/tree/slime-company-ecl)
+- If you intend to learn emacs in the longer run, look towards [slime-company](https://github.com/digikar99/emacs-noob/tree/slime-company).
+- If you do not intend to learn emacs and instead want to focus on Common Lisp, look towards [slime-company-modern](https://github.com/digikar99/emacs-noob/tree/slime-company-modern).
 
 ## Key-bindings
 
-**Text Editing**
+The intention is that `C-o`, `C-x`, `C-z` `<escape>` and several others should "just work". In case you think a particular key-binding should exist as default, feel free to raise an issue or a PR.
 
-- C-a: Select all
-- C-s [std]: Search (forward); because changing this means changing several other maps
-and we don't want to go "too far" from vanilla emacs, so that you get used to it as well
-- C-r: Replace (forward); because see C-h next
-- C-h (Backspace): Delete word to the left - this is so because on the terminal backspace
-and C-h are equivalent. And I haven't searched enough for a workaround.
-- C-z: Undo - in emacs, redo is undo of undo; this also avoids loss of redo-undo "trees"
-- `C-<space>` [std]: enter/exit text-selection mode
-- C-w [std]: Cut; because C-x is complicated
-- C-y [std]: Paste; because
-- C-v [std]: Scroll down
-- M-v [std]: Scroll up
-- C-g [std]: Cancel command
-- C-k [std]: Cut line this point forward
-- M-k: Delete line this point forward
-- C-/: Un/comment-line; also works for un/commenting region when selected
+The key-bindings are available at [init.el](./init.el).
+
+**Other partially non-standard key-bindings**
+
+- C-p: Switch buffer
 - C-l: Goto line
-
-
-
-- M-S-<up>/<down>: Move line (selected region) up or down
-- C-M-s: Forward search symbol at point
-- C-M-r: Forward replace symbol at point
 - M-q: Quit emacs (with prompt)
+- M-o: Other window
+- M-k: Delete line this point forward
+- M-h k: Help key
+- M-h v: Help variable
+- M-h f: Help function
+- M-S-<up>/<down>: Move line (selected region) up or down
+- C-M-f: Forward search symbol at point
+- C-M-h: Forward replace symbol at point
 
-
-**Window and Buffer Management**
+<br/>
 
 - F7: Split window horizontally: "<f10>" is more memorable, but its bound to something
 in some terminals
@@ -62,25 +61,8 @@ in some terminals
 - F11 [std]: Toggle "frame" full screen
 - S-F11: Delete other windows (this, to avoid accidentally pressing "<f11>" while
 trying to go full screen)
-- C-o [~std]: Switch window
-- M-o: Switch buffer
 
-- C-t: Open `*scratch*` buffer
-- C-S-t: Reopen closed file
-- `C-<tab>` / `C-S-<tab>`: Switch tabs
-- M-x [std]: arbitrary commands (helm-M-x)
-- C-x C-f [std]: Open file (helm-find-files)
-- C-x C-s [std]: Save file
-- C-x C-d [~std]: Open directory. Press '?' for help. (dired)
-- C-x C-w: Close file (kill-this-buffer)
-- C-x C-r: Rename file (and buffer)
-- C-x C-k: Delete this window
-
-**Miscellaneous**
-
-- M-h k: Help key
-- M-h v: Help variable
-- M-h f: Help function
+<br/>
 
 - M-m: ansi-term switch between line and char modes
 - M-n: ansi-term next command

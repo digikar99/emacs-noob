@@ -12,8 +12,9 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-screen t)
  '(make-backup-files nil)
- '(package-selected-packages (quote (ace-window auto-complete tabbar helm use-package)))
- '(tool-bar-mode nil))
+ '(package-selected-packages
+   (quote
+    (goto-chg ace-window auto-complete tabbar helm use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -32,17 +33,79 @@
   (package-refresh-contents)
   (package-install-selected-packages))
 
+;; Create almost-empty global keymap
+(let ((my-global-map (make-keymap)))
+  (substitute-key-definition 'self-insert-command
+                             'self-insert-command
+                             my-global-map
+                             global-map)
+  (cl-loop for digit below 9
+           do (define-key my-global-map
+                (kbd (concat "C-" (int-to-string digit)))
+                'digit-argument))
+  ;; Unable to do this using 'bind' in (use-package fundamental-mode ...)
+  (mapc (lambda (key-binding)
+          (define-key my-global-map (kbd (car key-binding)) (cdr key-binding))) 
+        '(("<up>" . previous-line)
+          ("<down>" . next-line)
+          ("<left>" . backward-char)
+          ("<right>" . forward-char)
+          
+          ("C-a" . mark-whole-buffer)
+          ("C-h" . query-replace)
+          ("C-g" . keyboard-quit)
+          ("C-j" . newline)
+          ("C-p" . switch-to-buffer)
+          ("C-v" . yank)
+          ("C-w" . kill-this-buffer)
+          ("C-l" . goto-line)
+          ("C-s" . save-buffer)
+          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
+          ("C-S-t" . reopen-killed-file)
+          ("C-z" . undo)
+          ("C-/" . comment-line)
+          
+          ("C-." . goto-last-change)
+          ("C-," . goto-last-change-reverse)
+
+          ("<return>" . newline-and-indent)
+          ("<tab>" . indent-for-tab-command)
+          ("<escape>" . keyboard-quit)
+          ("C-<left>" . backward-word)
+          ("C-<right>" . forward-word)
+          ("<end>" . end-of-visual-line)
+          ("C-<end>" . end-of-buffer)
+          ("<home>" . beginning-of-visual-line)
+          ("C-<home>" . beginning-of-buffer)
+          ("<backspace>" . delete-backward-char)
+          ("C-<backspace>" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!          
+          ("<delete>" . delete-forward-char)
+          ("C-<delete>" . kill-word)))
+  (use-global-map my-global-map))
+
 (use-package helm
   :ensure t
   :bind (:map helm-map 
-         ("<tab>" . helm-execute-persistent-action))
+              ("<tab>" . helm-execute-persistent-action)
+              ("<up>" . helm-previous-line)
+              ("<down>" . helm-next-line)
+              ("C-g" . helm-keyboard-quit)
+              ("<escape>" . helm-keyboard-quit)
+              ("<return>" . helm-confirm-and-exit-minibuffer))
   :bind* (("M-x" . helm-M-x)
-          ("C-x C-f" . helm-find-files)))
+          ("C-o" . helm-find-files))
+  :config (helm-mode))
+
+(use-package helm-files
+  :bind (:map helm-find-files-map
+              ("C-g" . helm-keyboard-quit)
+              ("<escape>" . helm-keyboard-quit)))
 
 (use-package tabbar
-  :bind ((:map tabbar-mode-map
-               ("<C-tab>" . tabbar-forward-tab)
-               ("<C-iso-lefttab>" . tabbar-backward-tab)))
+  :init (defvar user-buffers '("*scratch*"))
+  :bind (:map tabbar-mode-map
+              ("<C-tab>" . tabbar-forward-tab)
+              ("<C-iso-lefttab>" . tabbar-backward-tab))
   :ensure t
   :config
   (defun my-tabbar-buffer-groups () ;; customize to show all normal files in one group
@@ -50,7 +113,7 @@
     There are two groups: Emacs buffers (those whose name starts with '*', plus
     dired buffers), and the rest.  This works at least with Emacs v24.2 using
     tabbar.el v1.7."
-    (list (cond ((string= (buffer-name) "*scratch*") "user")
+    (list (cond ((member (buffer-name) user-buffers) "user")
                 ((string-equal "*" (substring (buffer-name) 0 1)) "emacs")
                 (t "user"))))
   (setq tabbar-buffer-groups-function 'my-tabbar-buffer-groups))
@@ -67,13 +130,13 @@
 
 (use-package term
   :bind (:map term-raw-map 
-         ("M-m" . term-line-mode)
-         ("M-n" . term-send-down)
-         ("M-p" . term-send-up)
-         :map term-mode-map 
-         ("M-m" . term-raw-mode)
-         ("M-n" . term-send-down)
-         ("M-p" . term-send-up)))
+              ("M-m" . term-line-mode)
+              ("M-n" . term-send-down)
+              ("M-p" . term-send-up)
+              :map term-mode-map 
+              ("M-m" . term-raw-mode)
+              ("M-n" . term-send-down)
+              ("M-p" . term-send-up)))
 
 (use-package ace-window
   :ensure t
@@ -146,71 +209,86 @@
     (interactive "*p")
     (move-text-internal (- arg)))
 
-  ;;; C-w only works when region is selected
-  (defun kill-region-when-active ()
-    (interactive)
-    (when (region-active-p)
-      (if (> (point) (mark))
-	  (exchange-point-and-mark))           
-      (kill-region (point) (mark))))
-
   ;;; M-k
   (defun ruthlessly-kill-line ()
     (interactive)
     (delete-char (- (line-end-position) (point)) nil))
 
-  ;;; Disable key bindings with C-x prefix
-  (cl-loop for ch below 128
-  	   do (global-set-key (kbd (concat "C-x " (string ch))) nil))
+  ;; Source: https://www.reddit.com/r/emacs/comments/4ermj9/how_to_restore_last_window_size_in_emacs/
+  ;; Custom functions/hooks for persisting/loading frame geometry upon save/load
+  (defun save-frameg ()
+    "Gets the current frame's geometry and saves to ~/.emacs.frameg."
+    (let ((frameg-font (frame-parameter (selected-frame) 'font))
+          (frameg-left (frame-parameter (selected-frame) 'left))
+          (frameg-top (frame-parameter (selected-frame) 'top))
+          (frameg-width (frame-parameter (selected-frame) 'width))
+          (frameg-height (frame-parameter (selected-frame) 'height))
+          (frameg-file (expand-file-name "~/.emacs.frameg")))
+      (with-temp-buffer
+        ;; Turn off backup for this file
+        (make-local-variable 'make-backup-files)
+        (setq make-backup-files nil)
+        (insert
+         ";;; This file stores the previous emacs frame's geometry.\n"
+         ";;; Last generated " (current-time-string) ".\n"
+         "(setq initial-frame-alist\n"
+         ;; " '((font . \"" frameg-font "\")\n"
+         " '("
+         (format " (top . %d)\n" (max frameg-top 0))
+         (format " (left . %d)\n" (max frameg-left 0))
+         (format " (width . %d)\n" (max frameg-width 0))
+         (format " (height . %d)))\n" (max frameg-height 0)))
+        (when (file-writable-p frameg-file)
+          (write-file frameg-file)))))
 
-  ;;; FIXME: C-x 8 doesn't set to nil
-  ;; (cl-loop for ch below 128
-  ;; 	   do (define-key iso-transl-ctl-x-8-map (kbd (concat "C-x 8 " (string ch))) nil))
-  
-  :bind (("C-a" . mark-whole-buffer)
-	 ("C-s" . isearch-forward)
-	 ("C-M-s" . isearch-forward-symbol-at-point)
-	 ("C-M-r" . isearch-query-replace-symbol-at-point)
-	 ("C-r" . query-replace)
-	 ("C-h" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!
-	 ("C-z" . undo)
-         ("C-j" . newline)
-	 ("C-w" . kill-region-when-active)
-	 ("C-y" . yank)
-	 ("C-l" . goto-line)
-         ("C-/" . comment-line)
-	 ("M-k" . ruthlessly-kill-line)
-         ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
-         ("C-S-t" . reopen-killed-file))
-  :bind* (("M-o" . switch-to-buffer)
-	  ("C-v" . scroll-up)
-	  ("M-v" . scroll-down)
-          ("C-o" . ace-window)
+  (defun load-frameg ()
+    "Loads ~/.emacs.frameg which should load the previous frame's geometry."
+    (let ((frameg-file (expand-file-name "~/.emacs.frameg")))
+      (when (file-readable-p frameg-file)
+        (load-file frameg-file))))
+
+  :bind (:map isearch-mode-map
+              ("C-S-f" . isearch-repeat-backward)
+              ("C-f" . isearch-repeat-forward)
+              :map minibuffer-local-map
+              ("<return>" . exit-minibuffer)
+              :map override-global-map
+              ("C-f" . isearch-forward))
+
+  :bind* (("C-M-f" . isearch-forward-symbol-at-point)
+          ("C-M-h" . isearch-query-replace-symbol-at-point)
+          ("M-h" . help-command)
+          ("M-q" . save-buffers-kill-emacs)
+          ("M-S-<up>" . move-text-up)
+          ("M-S-<down>" . move-text-down)
+          ("M-o" . ace-window)
+          ("M-e" . eval-last-sexp)
+          ("M-k" . delete-window)
+          ("M-r" . rename-file-and-buffer)
+          ("M-k" . ruthlessly-kill-line)
+          ("<mouse-1>" . mouse-set-point)
+          ("<mouse-4>" . scroll-down)
+          ("<mouse-5>" . scroll-up)
+	  ("<drag-mouse-1>" . mouse-set-region)
           ("<f8>" . split-window-vertically)
           ("<f9>" . delete-other-windows-vertically)
           ("<f7>" . split-window-horizontally)
           ("S-<f11>" . delete-other-windows)
-          ("<f11>" . toggle-frame-fullscreen)
-	  ("C-x C-e" . eval-last-sexp)
-          ("C-x C-r" . rename-file-and-buffer)
-          ("C-x C-w" . kill-this-buffer)
-	  ("C-x C-d" . dired)
-	  ("C-x C-k" . delete-window)
-	  ("C-x C-s" . save-buffer)
-	  ("M-h" . help-command)
-	  ("M-q" . save-buffers-kill-emacs)
-          ("M-S-<up>" . move-text-up)
-          ("M-S-<down>" . move-text-down)))
+          ("<f11>" . toggle-frame-fullscreen)))
 
 (progn
   (put 'upcase-region 'disabled nil)
   ;;; Smoother scrolling
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))
         mouse-wheel-progressive-speed t
-        mouse-wheel-follow-mouse t
+        mouse-wheel-follow-mouse 't
         scroll-step 1)
+  ;;; Save/Load window-geometry
+  (when window-system
+    (add-hook 'after-init-hook 'load-frameg)
+    (add-hook 'kill-emacs-hook 'save-frameg))
   ;;; Enable additional modes
-  (helm-mode)
+  (cua-mode)
   (tabbar-mode)
   (electric-pair-mode)
   (show-paren-mode)
