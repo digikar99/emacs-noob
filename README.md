@@ -48,8 +48,7 @@ make install
 **Configure init.el**
 
 - Drop the `init.el` in `.emacs.d`: `mkdir .emacs.d && wget https://raw.githubusercontent.com/digikar99/emacs-noob/slime-company/init.el -O ~/.emacs.d/init.el`.
-- Besides the [key bindings](#key-bindings) below, [this tutorial on emacs lisp](https://learnxinyminutes.com/docs/elisp/) should help you gain familiarity with the emacs workflow.
-- Now, change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary (say `/data/data/com.termux/files/home/.local/bin/ecl`). (Got the hang of `C-x C-e`?)
+- Now, change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary (say `/data/data/com.termux/files/home/.local/bin/ecl`). Place the cursor just beyond the closing parenthesis `)` and press `M-e`.
 
 **Get Started**
 
@@ -124,3 +123,5 @@ trying to go full screen)
 - C-c C-p: slime-profile-toggle-fdefinition
 - C-c M-r: slime-profile-report
 - C-c C-r: slime-profile-reset
+- M-.: slime-edit-definition
+- M-,: slime-pop-find-definition-stack
