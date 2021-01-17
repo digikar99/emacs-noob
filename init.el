@@ -14,7 +14,7 @@
  '(make-backup-files nil)
  '(package-selected-packages
    (quote
-    (slime company slime-company ace-window auto-complete tabbar helm use-package)))
+    (slime company slime-company ace-window auto-complete tabbar helm use-package goto-chg)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -198,6 +198,39 @@
             (split-window-if-not)
             (other-window 1)
             (switch-to-buffer buffer))))))
+
+  ;; Source: https://www.reddit.com/r/emacs/comments/4ermj9/how_to_restore_last_window_size_in_emacs/
+  ;; Custom functions/hooks for persisting/loading frame geometry upon save/load
+  (defun save-frameg ()
+    "Gets the current frame's geometry and saves to ~/.emacs.frameg."
+    (let ((frameg-font (frame-parameter (selected-frame) 'font))
+          (frameg-left (frame-parameter (selected-frame) 'left))
+          (frameg-top (frame-parameter (selected-frame) 'top))
+          (frameg-width (frame-parameter (selected-frame) 'width))
+          (frameg-height (frame-parameter (selected-frame) 'height))
+          (frameg-file (expand-file-name "~/.emacs.frameg")))
+      (with-temp-buffer
+        ;; Turn off backup for this file
+        (make-local-variable 'make-backup-files)
+        (setq make-backup-files nil)
+        (insert
+         ";;; This file stores the previous emacs frame's geometry.\n"
+         ";;; Last generated " (current-time-string) ".\n"
+         "(setq initial-frame-alist\n"
+         ;; " '((font . \"" frameg-font "\")\n"
+         " '("
+         (format " (top . %d)\n" (max frameg-top 0))
+         (format " (left . %d)\n" (max frameg-left 0))
+         (format " (width . %d)\n" (max frameg-width 0))
+         (format " (height . %d)))\n" (max frameg-height 0)))
+        (when (file-writable-p frameg-file)
+          (write-file frameg-file)))))
+
+  (defun load-frameg ()
+    "Loads ~/.emacs.frameg which should load the previous frame's geometry."
+    (let ((frameg-file (expand-file-name "~/.emacs.frameg")))
+      (when (file-readable-p frameg-file)
+        (load-file frameg-file))))  
   
   :bind (("C-x h" . mark-whole-buffer)
          ("C-a" . beginning-of-visual-line)
@@ -213,7 +246,9 @@
          ("C-y" . yank)
          ("C-l" . goto-line)
          ("C-/" . comment-line)
-         ("M-k" . ruthlessly-kill-line)
+         ("C-." . goto-last-change)
+         ("C-," . goto-last-change-reverse)
+	 ("M-k" . ruthlessly-kill-line)
          ("C-t" . (lambda () (interactive) (switch-to-buffer "*scratch*")))
          ("C-S-t" . reopen-killed-file))
   :bind* (("M-o" . switch-to-buffer)
@@ -264,6 +299,10 @@
         mouse-wheel-progressive-speed t
         mouse-wheel-follow-mouse t
         scroll-step 1)
+  ;;; Save/Load window-geometry
+  (when window-system
+    (add-hook 'after-init-hook 'load-frameg)
+    (add-hook 'kill-emacs-hook 'save-frameg))
   ;;; Enable additional modes
   (helm-mode)
   (tabbar-mode)

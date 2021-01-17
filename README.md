@@ -64,10 +64,16 @@ make install
 ## Features
 
 - Melpa added
-- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, slime, company, slime-company
+- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, slime, company, slime-company, goto-chg
 - `C-x` bindings not listed below are bound to nil: In case some exists that is missing below, it is a bug; report them! Known issue is `C-x 8-` key bindings which I've been unable to disable.
 - global electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
 - Slower scroll
+
+## Usage Intention
+
+- Use intended when you are limited to a terminal interface and want a more-or-less familiar interface for learning Common Lisp. The presence of terminal can mess up several keys, for instance `C-g` and `<backspace>` become equivalent (unless there's a workaround I do not know of!). Another being the response of scroll, forcing the existence of *some* key bindings for scrolling; with that case, *why not keep the default one*?
+- Why not *complete* default? Because the default binding of `C-z` would frustrate the new user. There are several other keys.
+- If you have access to a full GUI emacs and *do not want to learn* / *delay learning* emacs, take a look at [slime-company-modern](https://github.com/digikar99/emacs-noob/tree/slime-company-modern) branch.
 
 ## key-bindings
 
@@ -95,14 +101,15 @@ and C-h are equivalent. And I haven't searched enough for a workaround.
 - C-/: Un/comment-line; also works for un/commenting region when selected
 - C-l: Goto line
 
-
+<br/>
 
 - `M-S-<up>/<down>`: Move line (selected region) up or down
 - C-M-s: Forward search symbol at point
 - C-M-r: Forward replace symbol at point
 - M-q: Quit emacs (with prompt)
 - M-l: Open slime-repl
-
+- C-.: Goto last change (useful when one scrolls)
+- C-,: Goto last change reverse
 
 **Window and Buffer Management**
 
@@ -136,4 +143,3 @@ trying to go full screen)
 - M-m: ansi-term switch between line and char modes
 - M-n: ansi-term next command
 - M-p: ansi-term previous command
-
