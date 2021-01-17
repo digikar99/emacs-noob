@@ -14,23 +14,67 @@ Drop the `init.el` in your `~/.emacs.d/` and (re)start emacs.
 Emacs will download `use-package` and then the required packages. This should take
 a few minutes. Optionally, restart emacs.
 
+## On Startup
+
+**Get an implementation**
+
+- Get [an implementation](https://common-lisp.net/implementations): may be `sudo apt install sbcl # if you are using some linux distro`.
+
+- If you are on android, the following steps should help you get an ECL up and working (credits to the [following doc](https://github.com/plops/ecl-termux-binary)):
+
+```sh
+apt update && apt install build-essential texinfo git
+cd ~
+git clone https://gitlab.com/embeddable-common-lisp/ecl.git
+cd ecl
+git checkout 20.4.24
+./configure --prefix $HOME/.local --build=$(uname -m)-linux-android --enable-gmp=included
+make -j4 # or whatever your number of cores
+make install
+```
+
+**Install quicklisp**
+
+- Download quicklisp: `wget http://beta.quicklisp.org/quicklisp.lisp -O ~/quicklisp.lisp`.
+
+- Load quicklisp `/path/to/your/implementation --load ~/quicklisp.lisp` and follow the instructions. For example, for the android case above, this is `~/.local/bin/ecl --load ~/quicklisp.lisp`. In some cases, you might want to refer to `/path/to/your/implementation --help`or equivalent.
+
+```lisp
+(quicklisp-quickstart:install)
+(ql:add-to-init-file)
+(quit)
+```
+
+**Configure init.el**
+
+- Drop the `init.el` in `.emacs.d`: `mkdir .emacs.d && wget https://raw.githubusercontent.com/digikar99/emacs-noob/slime-company/init.el -O ~/.emacs.d/init.el`.
+- Besides the [key bindings](#key-bindings) below, [this tutorial on emacs lisp](https://learnxinyminutes.com/docs/elisp/) should help you gain familiarity with the emacs workflow.
+- Now, change `(setq inferior-lisp-program "/usr/bin/sbcl")` in [init.el](./init.el) to point to the appropriate binary (say `/data/data/com.termux/files/home/.local/bin/ecl`). (Got the hang of `C-x C-e`?)
+
+**Get Started**
+
+- If there were any errors, preferably restart emacs: `M-q yes` to quit. And then start again.
+- You may also want to learn about [emacs daemon](https://www.emacswiki.org/emacs/EmacsAsDaemon) - basically that `emacs --daemon` and `emacsclient` (and `C-x C-w` in our customization).
+- Any of `M-x slime`, `M-l`, `open-slime` to start slime and start playing with Common Lisp.
+
 ## Features
 
 - Melpa added
-- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, goto-chg
-- `C-x` bindings not listed below are bound to nil: In case some exists that is missing below, it is a bug; report them! Known issue is `C-x 8-` key bindings which I've been unable to disable.
+- Packages: use-package, tabbar-mode, ace-window, auto-complete, helm, goto-chg, slime, slime-company
+- `C-x` bindings are disabled unless some specific mode binds them.
 - global auto-complete-mode, electric-pair-mode, show-paren-mode, auto-revert-mode, visual-line-mode, linum-mode, column-number-mode, helm-mode
 - Slower / less-jerky scroll
 
 ## Usage Intention
 
-This branch `emacs-modern` is intended for one-off emacs usage. Users are *strongly discouraged* from using this in the longer run or for learning emacs. In the longer run, users might want to consider using the [master branch](https://github.com/digikar99/emacs-noob) or one of the more established [emacs starter kits](https://github.com/emacs-tw/awesome-emacs#starter-kit).
+This branch `slime-company-modern` is intended for focusing on Common Lisp instead of *both* Common Lisp and Emacs. Users are *strongly discouraged* from using this in the longer run or for learning emacs. In the longer run, users might want to consider using the [master branch](https://github.com/digikar99/emacs-noob) or one of the more established [emacs starter kits](https://github.com/emacs-tw/awesome-emacs#starter-kit).
+
+This does not touch paredit-mode or lispy or several other lisp helper modes. It is expected that as users gain familiarity with Common Lisp, they may touch these other "advanced" packages to help them with Common Lisp development... while opening their minds further at the same time.
 
 ## Branch Specialized for Common Lisp Development
 
 - If you do not have access to a full blown emacs GUI and are stuck with a terminal-only version, you are better off with [slime-company-ecl](https://github.com/digikar99/emacs-noob/tree/slime-company-ecl)
 - If you intend to learn emacs in the longer run, look towards [slime-company](https://github.com/digikar99/emacs-noob/tree/slime-company).
-- If you do not intend to learn emacs and instead want to focus on Common Lisp, look towards [slime-company-modern](https://github.com/digikar99/emacs-noob/tree/slime-company-modern).
 
 ## Key-bindings
 
@@ -40,8 +84,9 @@ The key-bindings are available at [init.el](./init.el).
 
 **Other partially non-standard key-bindings**
 
-- C-p: Switch buffer
 - C-l: Goto line
+- M-l: Open slime repl
+- M-b: Switch buffer
 - M-q: Quit emacs (with prompt)
 - M-o: Other window
 - M-k: Delete line this point forward
@@ -67,3 +112,15 @@ trying to go full screen)
 - M-m: ansi-term switch between line and char modes
 - M-n: ansi-term next command
 - M-p: ansi-term previous command
+
+**SLIME (Intended) Key Bindings**
+
+- M-l: Open slime repl
+- C-c C-c: slime-compile-defun
+- C-c C-d C-d: slime-describe-symbol
+- C-x C-e: slime-eval-last-expression
+- C-c C-e: macrostep-expand
+- C-c C-t: slime-toggle-fancy-trace
+- C-c C-p: slime-profile-toggle-fdefinition
+- C-c M-r: slime-profile-report
+- C-c C-r: slime-profile-reset

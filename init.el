@@ -14,7 +14,7 @@
  '(make-backup-files nil)
  '(package-selected-packages
    (quote
-    (goto-chg ace-window auto-complete tabbar helm use-package))))
+    (slime-company slime goto-chg ace-window auto-complete tabbar helm use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -55,7 +55,6 @@
           ("C-h" . query-replace)
           ("C-g" . keyboard-quit)
           ("C-j" . newline)
-          ("C-p" . switch-to-buffer)
           ("C-v" . yank)
           ("C-w" . kill-this-buffer)
           ("C-l" . goto-line)
@@ -80,7 +79,12 @@
           ("<backspace>" . delete-backward-char)
           ("C-<backspace>" . backward-kill-word) ; also bound to C-<backspace> in terminal mode!          
           ("<delete>" . delete-forward-char)
-          ("C-<delete>" . kill-word)))
+          ("C-<delete>" . kill-word)
+          
+          ("<mouse-1>" . mouse-set-point)
+          ("<mouse-4>" . scroll-down)
+          ("<mouse-5>" . scroll-up)
+          ("<drag-mouse-1>" . mouse-set-region)))
   (use-global-map my-global-map))
 
 (use-package helm
@@ -133,7 +137,7 @@
               ("M-m" . term-line-mode)
               ("M-n" . term-send-down)
               ("M-p" . term-send-up)
-              :map term-mode-map 
+         :map term-mode-map 
               ("M-m" . term-raw-mode)
               ("M-n" . term-send-down)
               ("M-p" . term-send-up)))
@@ -250,9 +254,13 @@
   :bind (:map isearch-mode-map
               ("C-S-f" . isearch-repeat-backward)
               ("C-f" . isearch-repeat-forward)
-              :map minibuffer-local-map
+         :map minibuffer-local-map
               ("<return>" . exit-minibuffer)
-              :map override-global-map
+         :map package-menu-mode-map
+              ("<return>" . package-menu-describe-package)
+         :map help-mode-map
+              ("<return>" . push-button)
+         :map override-global-map
               ("C-f" . isearch-forward))
 
   :bind* (("C-M-f" . isearch-forward-symbol-at-point)
@@ -261,20 +269,83 @@
           ("M-q" . save-buffers-kill-emacs)
           ("M-S-<up>" . move-text-up)
           ("M-S-<down>" . move-text-down)
+          ("M-b" . switch-to-buffer)
           ("M-o" . ace-window)
           ("M-e" . eval-last-sexp)
           ("M-k" . delete-window)
           ("M-r" . rename-file-and-buffer)
           ("M-k" . ruthlessly-kill-line)
-          ("<mouse-1>" . mouse-set-point)
-          ("<mouse-4>" . scroll-down)
-          ("<mouse-5>" . scroll-up)
-	  ("<drag-mouse-1>" . mouse-set-region)
           ("<f8>" . split-window-vertically)
           ("<f9>" . delete-other-windows-vertically)
           ("<f7>" . split-window-horizontally)
           ("S-<f11>" . delete-other-windows)
           ("<f11>" . toggle-frame-fullscreen)))
+
+(use-package company
+  :ensure t
+  :hook ((slime-repl-mode common-lisp-mode emacs-lisp-mode) . company-mode)
+  :config
+  (setq company-minimum-prefix-length 2
+        company-idle-delay 0.1
+        company-flx-limit 20))
+
+(use-package lisp-mode
+  :bind (:map lisp-mode-map
+              ("C-c C-e" . macrostep-expand)))
+
+(use-package slime
+  :ensure t
+  :bind (:map slime-mode-map
+              ("C-c C-e" . macrostep-expand)
+              ("C-c C-p" . slime-toggle-profile-fdefinition)
+              ("C-c M-r" . slime-profile-report)
+              ("C-c C-r" . slime-profile-reset)
+         :map slime-repl-mode-map
+              ("C-c C-p" . slime-toggle-profile-fdefinition)
+              ("C-c M-r" . slime-profile-report)
+              ("C-c C-r" . slime-profile-reset)
+         :map sldb-mode-map
+              ("<mouse-1>" . sldb-default-action/mouse))
+  :bind* (("M-l" . open-slime))
+  :hook (slime-mode . (lambda ()
+                        (set (make-local-variable 'company-backends)
+                             '((company-slime company-capf)))))
+  :config
+  (setq inferior-lisp-program "sbcl") ; substitute with the path to the compiler
+  (slime-setup '(slime-fancy slime-company))
+  (defun window-with-name-prefix-live-p (name)
+    (cl-some (lambda (buffer-name)
+               (string-prefix-p name buffer-name))
+             (mapcar #'buffer-name
+                     (mapcar #'window-buffer
+                             (window-list)))))
+
+  (defun split-window-if-not ()
+    (if (= 1 (length (window-list))) (split-window)))
+  (defun open-slime ()
+    (interactive)    
+    (let* ((buffer-prefix "*slime-repl"))
+      (unless (window-with-name-prefix-live-p buffer-prefix)
+        (let* ((buffer-name-list (mapcar #'buffer-name
+                                         (buffer-list)))
+               (buffer (cl-loop for buffer-name in (mapcar #'buffer-name (buffer-list))
+                                until (string-match-p (regexp-quote buffer-prefix)
+                                                       buffer-name)
+                                finally (if (string-match-p (regexp-quote buffer-prefix)
+                                                             buffer-name)
+                                             (cl-return buffer-name)
+                                           nil))))
+          (if (not buffer)
+              (slime)
+            (split-window-if-not)
+            (other-window 1)
+            (switch-to-buffer buffer)))))))
+
+(use-package slime-company
+  :after (slime company)
+  :ensure t
+  :config
+  (setq slime-company-completion 'fuzzy))
 
 (progn
   (put 'upcase-region 'disabled nil)
@@ -294,7 +365,7 @@
   (show-paren-mode)
   (column-number-mode)
   (global-auto-revert-mode t)
-  (global-auto-complete-mode 1)
   (global-linum-mode)
+  (setq-default indent-tabs-mode nil)
   ;;; Confirm
   (setq confirm-kill-emacs 'yes-or-no-p))
