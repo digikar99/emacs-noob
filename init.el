@@ -87,7 +87,9 @@
           ("<mouse-5>" . mwheel-scroll)
           ("<drag-mouse-1>" . mouse-set-region)
           ("<vertical-line>" . mouse-drag-vertical-line)
-          ("<mode-line>" . mouse-drag-mode-line)))
+          ("<mode-line>" . mouse-drag-mode-line)
+          ("<C-mouse-4>" . text-scale-increase)
+          ("<C-mouse-5>" . text-scale-decrease)))
   (use-global-map my-global-map))
 
 (use-package helm
