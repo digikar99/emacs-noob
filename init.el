@@ -82,9 +82,11 @@
           ("C-<delete>" . kill-word)
           
           ("<mouse-1>" . mouse-set-point)
-          ("<mouse-4>" . scroll-down)
-          ("<mouse-5>" . scroll-up)
-          ("<drag-mouse-1>" . mouse-set-region)))
+          ("<mouse-4>" . mwheel-scroll)
+          ("<mouse-5>" . mwheel-scroll)
+          ("<drag-mouse-1>" . mouse-set-region)
+          ("<vertical-line>" . mouse-drag-vertical-line)
+          ("<mode-line>" . mouse-drag-mode-line)))
   (use-global-map my-global-map))
 
 (use-package helm
