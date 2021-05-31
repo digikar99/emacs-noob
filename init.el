@@ -84,11 +84,14 @@
           ("<mouse-1>" . mouse-set-point)
           ("<mouse-4>" . mwheel-scroll)
           ("<mouse-5>" . mwheel-scroll)
+          ("<down-mouse-1>" . mouse-drag-region)
           ("<drag-mouse-1>" . mouse-set-region)
           ("<vertical-line>" . mouse-drag-vertical-line)
           ("<mode-line>" . mouse-drag-mode-line)
           ("<C-mouse-4>" . text-scale-increase)
-          ("<C-mouse-5>" . text-scale-decrease)))
+          ("<C-mouse-5>" . text-scale-decrease)
+
+          ("C-SPC" . set-mark-command)))
   (use-global-map my-global-map))
 
 (use-package helm
