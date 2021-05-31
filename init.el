@@ -275,10 +275,32 @@
 (use-package company
   :ensure t
   :hook ((slime-repl-mode common-lisp-mode emacs-lisp-mode) . company-mode)
+  :bind (:map company-active-map
+              ("C-p" . (lambda ()
+                          (interactive)
+                          (company-select-previous)
+                          (company-permanently-show-doc-buffer)))
+              ("C-n" . (lambda ()
+                            (interactive)
+                            (company-select-next)
+                            (company-permanently-show-doc-buffer)))
+              ("SPC" . (lambda ()
+                         (interactive)
+                         (company-abort)
+                         (insert " "))))
   :config
   (setq company-minimum-prefix-length 2
         company-idle-delay 0.1
-        company-flx-limit 20))
+        company-flx-limit 20)
+  (defun company-permanently-show-doc-buffer ()
+    "Temporarily show the documentation buffer for the selection."
+    (interactive)
+    (let* ((selected (nth company-selection company-candidates))
+           (doc-buffer (or (company-call-backend 'doc-buffer selected)
+                           (error "No documentation available"))))
+      (with-current-buffer doc-buffer
+        (goto-char (point-min)))
+      (display-buffer doc-buffer t))))
 
 (use-package slime
   :ensure t
@@ -289,8 +311,18 @@
 (use-package slime-company
   :after (slime company)
   :ensure t
+  :bind (:map slime-editing-map
+              ("C-c C-d d" . company-maybe-show-doc-buffer)
+              ("C-c C-d C-d" . company-maybe-show-doc-buffer))
   :config
-  (setq slime-company-completion 'fuzzy))
+  (setq slime-company-completion 'fuzzy)
+  (defun company-maybe-show-doc-buffer (symbol-name)
+    (interactive (list (slime-read-symbol-name "Describe symbol: ")))
+    (if (not (member 'company-mode minor-mode-list))
+        (slime-describe-symbol symbol-name)
+      (call-interactively 'company-manual-begin)
+      (call-interactively 'company-permanently-show-doc-buffer)
+      (call-interactively 'company-abort))))
 
 (progn
   (put 'upcase-region 'disabled nil)
