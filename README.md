@@ -14,6 +14,10 @@ Drop the `init.el` in your `~/.emacs.d/` and (re)start emacs.
 Emacs will download `use-package` and then the required packages. This should take
 a few minutes. Optionally, restart emacs.
 
+<p align="center">
+<img src="./slime-company.png" height="800px"/>
+</p>
+
 ## On Startup
 
 **Get an implementation**
