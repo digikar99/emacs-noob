@@ -294,29 +294,21 @@
   :bind (:map company-active-map
               ("<up>" . (lambda ()
                           (interactive)
-                          (company-select-previous)
-                          (company-permanently-show-doc-buffer)))
+                          (company-select-previous)))
               ("<down>" . (lambda ()
                             (interactive)
-                            (company-select-next)
-                            (company-permanently-show-doc-buffer)))
+                            (company-select-next)))
               ("SPC" . (lambda ()
                          (interactive)
                          (company-abort)
-                         (insert " "))))
+                         (insert " ")))
+              ("<return>" . nil)
+              ("RET" . nil)
+              ("<tab>" . company-complete))
   :config
   (setq company-minimum-prefix-length 2
         company-idle-delay 0.1
-        company-flx-limit 20)
-  (defun company-permanently-show-doc-buffer ()
-    "Temporarily show the documentation buffer for the selection."
-    (interactive)
-    (let* ((selected (nth company-selection company-candidates))
-           (doc-buffer (or (company-call-backend 'doc-buffer selected)
-                           (error "No documentation available"))))
-      (with-current-buffer doc-buffer
-        (goto-char (point-min)))
-      (display-buffer doc-buffer t))))
+        company-flx-limit 20))
 
 (use-package lisp-mode
   :bind (:map lisp-mode-map
@@ -357,7 +349,7 @@
       (unless (window-with-name-prefix-live-p buffer-prefix)
         (let* ((buffer-name-list (mapcar #'buffer-name
                                          (buffer-list)))
-               (buffer (cl-loop for buffer-name in (mapcar #'buffer-name (buffer-list))
+                (buffer (cl-loop for buffer-name in (mapcar #'buffer-name (buffer-list))
                                 until (string-match-p (regexp-quote buffer-prefix)
                                                        buffer-name)
                                 finally (if (string-match-p (regexp-quote buffer-prefix)
@@ -373,18 +365,18 @@
 (use-package slime-company
   :after (slime company)
   :ensure t
-  :bind (:map slime-editing-map
-              ("C-c C-d d" . company-maybe-show-doc-buffer)
-              ("C-c C-d C-d" . company-maybe-show-doc-buffer))
   :config
   (setq slime-company-completion 'fuzzy)
-  (defun company-maybe-show-doc-buffer (symbol-name)
-    (interactive (list (slime-read-symbol-name "Describe symbol: ")))
-    (if (not (member 'company-mode minor-mode-list))
-        (slime-describe-symbol symbol-name)
-      (call-interactively 'company-manual-begin)
-      (call-interactively 'company-permanently-show-doc-buffer)
-      (call-interactively 'company-abort))))
+  ;; We redefine this function to call SLIME-COMPANY-DOC-MODE in the buffer
+  (defun slime-show-description (string package)
+    (let ((bufname (slime-buffer-name :description)))
+      (slime-with-popup-buffer (bufname :package package
+					:connection t
+					:select slime-description-autofocus)
+	(when (string= bufname "*slime-description*")
+	  (with-current-buffer bufname (slime-company-doc-mode)))
+	(princ string)
+	(goto-char (point-min))))))
 
 (progn
   (put 'upcase-region 'disabled nil)
